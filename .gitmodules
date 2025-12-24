@@ -1,0 +1,6 @@
+[submodule "KernelBench"]
+	path = KernelBench
+	url = https://github.com/lanmogu98/KernelBench.git
+[submodule "openevolve"]
+	path = openevolve
+	url = https://github.com/lanmogu98/openevolve.git
