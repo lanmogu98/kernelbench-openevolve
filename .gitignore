@@ -42,3 +42,7 @@ openevolve_output*/
 *.temp
 scratch/
 
+# Personal notes (not for upstream)
+mynotes/
+README.md
+
