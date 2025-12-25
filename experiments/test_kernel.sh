@@ -24,7 +24,9 @@ echo ""
 echo "=== 步骤 2: 服务器 git pull + 运行测试 ==="
 ssh A800-didi "cd ~/projects/kernelbench-openevolve && \
     git pull && \
-    export HF_ENDPOINT='https://mirrors.tuna.tsinghua.edu.cn/' && \
+    source ~/miniconda3/etc/profile.d/conda.sh && \
+    conda activate kernelbench-evolve && \
+    export HF_ENDPOINT='https://hf-mirror.com' && \
     cd KernelBench && \
     PYTHONPATH=. python3 scripts/run_and_check.py \
     ref_origin=kernelbench \
