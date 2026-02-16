@@ -72,12 +72,10 @@ kernelbench-openevolve/
 │   ├── test_kernel.sh                  # One-click kernel test script
 │   └── env_*.sh                        # Environment configs (local/server)
 ├── mynotes/                             # Personal notes (git-ignored)
-│   ├── ACTION_ROADMAP.md               # Original integration roadmap
-│   ├── KNOWLEDGE_BACKGROUND_REPORT.md  # Background research
-│   ├── OPENEVOLVE_MECHANISM_GUIDE.md   # Deep dive into OpenEvolve internals
 │   ├── KERNELBENCH_DEV_REFERENCE.md    # KernelBench dev quick reference
 │   ├── OPENSOURCE_CONTRIBUTION_WORKFLOW.md  # Git/PR workflow reference
-│   └── ...                             # Issue notes, verification guide, etc.
+│   ├── reference/                      # Knowledge base (OpenEvolve internals, KernelBench arch)
+│   └── archive/                        # Historical docs (original roadmap, CS149 report, etc.)
 └── README.md
 ```
 
