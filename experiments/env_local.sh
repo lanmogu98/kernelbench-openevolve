@@ -8,3 +8,5 @@ unset HF_HOME
 
 echo "✓ 已配置为本地模式（使用官方 HuggingFace）"
 
+
+
