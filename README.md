@@ -15,7 +15,7 @@ Research project exploring evolutionary GPU kernel optimization by integrating [
 The existing `mlx_metal_kernel_opt` example had critical evaluation bugs that invalidated all prior results:
 
 | Fix | Problem | Impact |
-|-----|---------|--------|
+| --- | ------- | ------ |
 | Subprocess kernel hook | Evolved kernels were silently ignored in benchmark subprocesses | Benchmarks were measuring baseline, not evolved code |
 | bfloat16 correctness gate | Correctness tests used float32 inputs | Kernels passed correctness but failed at actual inference dtype |
 | Architecture alignment | Docs/prompts assumed 40:8 head ratio | Qwen3-0.6B is actually 16:8 (2:1 GQA) |
@@ -25,19 +25,22 @@ The existing `mlx_metal_kernel_opt` example had critical evaluation bugs that in
 
 See [`openevolve/examples/mlx_metal_kernel_opt/EVOLUTION_ANALYSIS.md`](openevolve/examples/mlx_metal_kernel_opt/EVOLUTION_ANALYSIS.md) for the full analysis.
 
-### Phase 2: KernelBench-style Evaluation (In Progress)
+### Phase 2: KernelBench × OpenEvolve Integration (In Progress)
 
-The evolution analysis identified **feedback quality** as the root cause of failure. The current `combined_score` is meaningless to both the LLM and MAP-Elites selection. KernelBench provides a proven evaluation framework with directly actionable metrics:
+The evolution analysis identified **feedback quality** as the root cause of failure. KernelBench upstream has since built exactly the evaluation primitives needed to fix this — see [Issue #73](https://github.com/ScalingIntelligence/KernelBench/issues/73) (which cites the MLX example fixed in Phase 1).
 
-| Metric | Current (broken) | KernelBench-style (target) |
+| Metric | Current (broken) | KernelBench v0.2 (target) |
 |--------|------------------|---------------------------|
 | Fitness score | Abstract `combined_score` | Direct `speedup = baseline_time / custom_time` |
 | Correctness | Binary pass/fail | Binary + `max_difference`, `avg_difference` |
-| Performance | Single number | `mean +/- std` with confidence intervals |
+| Performance | Single number | `mean +/- std` with statistical timing (`timing.py`) |
+| Reward hacking | None | Static kernel code checker (`kernel_static_checker.py`) |
 | Population metric | None | `fast_p` (fraction correct AND faster than threshold) |
 | Prompt feedback | "Score: 2.96" | "Speedup: 0.85x (15% slower), need > 1.0x" |
 
-Branch: `feature/kernelbench-integration` (early prototype, needs rebase onto current `main`).
+**Stage 1 (local, M4 Max)**: Wire up KernelBench's eval pipeline (`Dataset` + `timing` + `kernel_static_checker`) as the fitness function for OpenEvolve, starting with the MLX Metal kernel example. Apple Silicon's unified memory architecture is also a research interest — it changes the kernel optimization landscape.
+
+**Stage 2 (AWS)**: Generalize the integration to CUDA backends and validate across the full KernelBench problem set on A100/H100 instances.
 
 ### Phase 3: Evolution Mechanism Improvements (Planned)
 
@@ -65,7 +68,7 @@ kernelbench-openevolve/
 │       ├── best_program_info.json       # Committed demo: metrics snapshot
 │       ├── README.md                    # Example guide
 │       └── EVOLUTION_ANALYSIS.md        # Detailed failure analysis + future work
-├── KernelBench/                         # Submodule: GPU kernel benchmark suite
+├── KernelBench/                         # Submodule: GPU kernel benchmark suite (v0.2)
 ├── experiments/                         # Local experiment scripts and results
 │   ├── generated_kernels/              # LLM-generated CUDA kernels
 │   ├── verification_results/           # MLX Metal verification snapshots
@@ -123,7 +126,6 @@ For the full fork + PR workflow, see `mynotes/OPENSOURCE_CONTRIBUTION_WORKFLOW.m
 | Branch | Status | Purpose |
 |--------|--------|---------|
 | `main` | Active | Synced with upstream, stable |
-| `feature/kernelbench-integration` | Paused | KernelBench evaluation prototype (needs rebase) |
 
 Completed / merged branches are deleted after upstream merge.
 
@@ -134,9 +136,10 @@ Completed / merged branches are deleted after upstream merge.
 - **Upstream PR**: [#377 — Fix mlx_metal_kernel_opt evaluation validity](https://github.com/algorithmicsuperintelligence/openevolve/pull/377)
 - **Upstream Issue**: [#372 — Subprocess benchmarks ignore evolved kernels](https://github.com/algorithmicsuperintelligence/openevolve/issues/372)
 - **Evolution Analysis**: [`EVOLUTION_ANALYSIS.md`](openevolve/examples/mlx_metal_kernel_opt/EVOLUTION_ANALYSIS.md)
+- **KernelBench Roadmap**: [Issue #73 — Integration with Open-Source Frameworks](https://github.com/ScalingIntelligence/KernelBench/issues/73) (cites this project's MLX example)
 - **KernelBench**: [github.com/ScalingIntelligence/KernelBench](https://github.com/ScalingIntelligence/KernelBench)
 - **OpenEvolve**: [github.com/algorithmicsuperintelligence/openevolve](https://github.com/algorithmicsuperintelligence/openevolve)
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-24*
